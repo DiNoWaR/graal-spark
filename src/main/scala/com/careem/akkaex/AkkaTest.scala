@@ -37,8 +37,6 @@ object AkkaTest {
 
     emotionalActorSystem.terminate()
   }
-
-
 }
 
 trait SimpleThing
