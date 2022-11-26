@@ -33,7 +33,6 @@ object AkkaTest {
           Behaviors.same
       }
     }
-
     val emotionalActorSystem = ActorSystem(emotionalMutableActor, "EmotionalSystem")
     val scheduler = emotionalActorSystem.scheduler
 
