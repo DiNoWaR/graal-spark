@@ -6,12 +6,9 @@ object SparkUtil {
 
   def getSparkSession(): SparkSession = {
     val spark = SparkSession
-      .builder()
-      .appName("Spark Graal VM Example")
-      .config("spark.some.config.option", "some-value")
-      .getOrCreate()
+      .builder().appName("Spark Graal VM Example").config("spark.some.config.option", "some-value").getOrCreate()
 
-    spark.ggg
+    spark
   }
 
 }
