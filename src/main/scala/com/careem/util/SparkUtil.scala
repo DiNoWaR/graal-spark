@@ -11,7 +11,7 @@ object SparkUtil {
       .config("spark.some.config.option", "some-value")
       .getOrCreate()
 
-    spark
+    spark.ggg
   }
 
 }
