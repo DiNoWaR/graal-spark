@@ -1,7 +1,7 @@
 package com.careem
 import com.careem.model._
 import com.careem.util.SparkUtil
-import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SQLContext}
+import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SQLContext, SaveMode}
 import org.apache.spark.sql.execution.streaming.MemoryStream
 import faker._
 import org.apache.spark.sql.streaming.Trigger
@@ -40,12 +40,13 @@ object Launcher {
       val queryName = Faker.default.firstName()
       source.toDF
         .writeStream
-        .trigger(Trigger.ProcessingTime("10 seconds"))
+        .trigger(Trigger.ProcessingTime("40 seconds"))
         .queryName(queryName)
         .foreachBatch { (batchDF: DataFrame, batchId: Long) =>
           batchDF.withColumn("month", month(to_date($"regDate", "dd/MM/yy mm:ss")))
             .write
             .partitionBy("month")
+            .mode(SaveMode.Overwrite)
             .format("delta")
             .save(s"${OUTPUT_PATH}/${queryName}")
         }
