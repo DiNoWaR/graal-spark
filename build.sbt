@@ -13,6 +13,7 @@ libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion
 libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion
 libraryDependencies += "org.apache.spark" %% "spark-mllib" % sparkVersion
 libraryDependencies += "io.github.etspaceman" %% "scalacheck-faker" % "7.0.0"
+libraryDependencies += "io.delta" %% "delta-core" % "2.0.0"
 libraryDependencies += "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % Test
 

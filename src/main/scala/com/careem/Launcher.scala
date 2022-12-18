@@ -1,12 +1,13 @@
 package com.careem
 import com.careem.model._
 import com.careem.util.SparkUtil
-import org.apache.spark.sql.{Encoder, Encoders, SQLContext}
+import org.apache.spark.sql.{DataFrame, Encoder, Encoders, SQLContext}
 import org.apache.spark.sql.execution.streaming.MemoryStream
 import faker._
 import org.apache.spark.sql.streaming.Trigger
 import akka.actor.typed.{ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
+import org.apache.spark.sql.functions.{month, to_date, weekofyear}
 
 import java.time.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,8 +23,10 @@ object Launcher {
   private val userSource = MemoryStream[User]
   private val addressSource = MemoryStream[Address]
 
-  def main(args: Array[String]): Unit = {
+  private val OUTPUT_PATH = "/Users/denisvasilyev/Documents/Projects/Careem/graal-spark/output"
 
+  def main(args: Array[String]): Unit = {
+    import spark.implicits._
     val generateActor = createGenerator()
     val generatorSystem = ActorSystem(generateActor, "GeneratorSystem")
     val scheduler = generatorSystem.scheduler
@@ -33,14 +36,21 @@ object Launcher {
 
     val sources = List(userSource, addressSource).par
 
-    sources.foreach(source =>
+    sources.foreach(source => {
+      val queryName = Faker.default.firstName()
       source.toDF
         .writeStream
-        .format("console")
-        .trigger(Trigger.ProcessingTime("20 seconds"))
-        .queryName(Faker.default.firstName())
+        .trigger(Trigger.ProcessingTime("10 seconds"))
+        .queryName(queryName)
+        .foreachBatch { (batchDF: DataFrame, batchId: Long) =>
+          batchDF.withColumn("month", month(to_date($"regDate", "dd/MM/yy mm:ss")))
+            .write
+            .partitionBy("month")
+            .format("delta")
+            .save(s"${OUTPUT_PATH}/${queryName}")
+        }
         .start
-    )
+    })
     spark.streams.awaitAnyTermination()
   }
 

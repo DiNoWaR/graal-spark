@@ -8,7 +8,7 @@ import scala.util.Random
 
 trait StreamingSource extends Serializable with Product
 case class User(id:Long, name:String, lastName: String, email:String, regDate:String) extends StreamingSource
-case class Address(id: Long, city: String, updatedAt:String) extends StreamingSource
+case class Address(id: Long, city: String, regDate:String) extends StreamingSource
 
 object User {
   def generateUser():User = {
@@ -25,7 +25,7 @@ object Address {
   def generateAddress(): Address ={
     Address(id = Common.rand.nextInt(1000),
       city = Faker.default.city(),
-      updatedAt = Common.formatter.format(Faker.default.pastInstant())
+      regDate = Common.formatter.format(Faker.default.pastInstant())
     )
   }
 }
