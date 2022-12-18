@@ -24,7 +24,7 @@ object Launcher {
 
   def main(args: Array[String]): Unit = {
 
-    val generateActor = createDataActor()
+    val generateActor = createGenerator()
     val generatorSystem = ActorSystem(generateActor, "GeneratorSystem")
     val scheduler = generatorSystem.scheduler
 
@@ -44,7 +44,7 @@ object Launcher {
     spark.streams.awaitAnyTermination()
   }
 
-  private def createDataActor(): Behavior[StreamingMessage] = {
+  private def createGenerator(): Behavior[StreamingMessage] = {
     Behaviors.setup { context =>
       Behaviors.receiveMessage {
         case UserMessage =>
