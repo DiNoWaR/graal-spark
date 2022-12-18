@@ -7,8 +7,8 @@ object SparkUtil {
   def getSparkSession(): SparkSession = {
     val spark = SparkSession
       .builder()
+      .master("local[*]")
       .appName("Spark Graal VM Example")
-      .config("spark.some.config.option", "some-value")
       .getOrCreate()
 
     spark
