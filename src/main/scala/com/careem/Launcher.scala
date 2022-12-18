@@ -44,7 +44,7 @@ object Launcher {
     spark.streams.awaitAnyTermination()
   }
 
-  private def createDataActor(): Behavior[StreamingMessage] =
+  private def createDataActor(): Behavior[StreamingMessage] = {
     Behaviors.setup { context =>
       Behaviors.receiveMessage {
         case UserMessage =>
@@ -62,6 +62,7 @@ object Launcher {
           Behaviors.same
       }
     }
+  }
 }
 
 sealed trait StreamingMessage
