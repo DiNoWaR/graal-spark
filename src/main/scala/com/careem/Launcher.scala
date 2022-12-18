@@ -8,6 +8,7 @@ import org.apache.spark.sql.streaming.Trigger
 import akka.actor.typed.{ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
 import org.apache.spark.sql.functions.{month, to_date, weekofyear}
+import io.delta.tables._
 
 import java.time.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,15 +41,21 @@ object Launcher {
       val queryName = Faker.default.firstName()
       source.toDF
         .writeStream
-        .trigger(Trigger.ProcessingTime("40 seconds"))
+        .trigger(Trigger.ProcessingTime("30 seconds"))
         .queryName(queryName)
-        .foreachBatch { (batchDF: DataFrame, batchId: Long) =>
+        .foreachBatch { (batchDF: DataFrame, batchId: Long) => {
+          if (batchId > 0 && batchId % 5 == 0) {
+            println("executing compaction")
+            val deltaTable = DeltaTable.forPath(spark, s"${OUTPUT_PATH}/${queryName}")
+            deltaTable.optimize().executeCompaction()
+          }
           batchDF.withColumn("month", month(to_date($"regDate", "dd/MM/yy mm:ss")))
             .write
             .partitionBy("month")
             .mode(SaveMode.Overwrite)
             .format("delta")
             .save(s"${OUTPUT_PATH}/${queryName}")
+        }
         }
         .start
     })
