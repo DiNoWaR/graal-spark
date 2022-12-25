@@ -31,7 +31,7 @@ object Address {
 }
 
 object Common {
-  private[model] val formatter = DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
+  private[model] val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
     .withLocale( Locale.UK )
     .withZone( ZoneId.systemDefault() )
 
